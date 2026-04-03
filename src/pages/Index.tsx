@@ -684,11 +684,16 @@ export default function Index() {
 
             <div className="grid sm:grid-cols-3 gap-4 mb-16 animate-fade-up delay-300">
               {[
-                { icon: "Mail", label: "Почта", value: "gcesnokov549@gmail.com" },
-                { icon: "Send", label: "Telegram", value: "Скоро" },
-                { icon: "BookOpen", label: "Рассказы", value: "На этом сайте" },
+                { icon: "Mail", label: "Почта", value: "gcesnokov549@gmail.com", href: "mailto:gcesnokov549@gmail.com" },
+                { icon: "Send", label: "Telegram", value: "@Zenit_top01", href: "https://t.me/Zenit_top01" },
+                { icon: "BookOpen", label: "Рассказы", value: "На этом сайте", href: null },
               ].map((contact) => (
-                <div key={contact.label} className="card-literary p-6 text-center">
+                <div
+                  key={contact.label}
+                  className="card-literary p-6 text-center"
+                  onClick={() => contact.href && window.open(contact.href, "_blank")}
+                  style={{ cursor: contact.href ? "pointer" : "default" }}
+                >
                   <Icon
                     name={contact.icon as "Mail"}
                     size={20}
