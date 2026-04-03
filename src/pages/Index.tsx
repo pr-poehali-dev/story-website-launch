@@ -103,11 +103,12 @@ const STORIES = [
 const BOOKS = [
   {
     id: 1,
-    title: "Книга 1",
-    year: "—",
-    pages: 0,
-    description: "Здесь появится описание вашей книги. Пришлите название, год и описание — добавлю.",
+    title: "Железная пятёрка",
+    year: "2026",
+    pages: null,
+    description: "История про дворовую футбольную команду из маленького посёлка. О дружбе, упорстве, первых победах и последнем матче. Жизненная проза — такая, в которой узнаёшь себя.",
     genre: "Жизненная проза",
+    status: "soon",
     cover: BOOK_IMAGE,
   },
 ];
@@ -566,14 +567,22 @@ export default function Index() {
                       </div>
                     </div>
                     <div className="flex flex-col justify-center">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-3 mb-4">
                         <span className="font-ibm text-xs tracking-widest uppercase text-muted-foreground">
                           {book.genre}
                         </span>
                         <span className="text-muted-foreground">·</span>
                         <span className="font-ibm text-xs text-muted-foreground">
-                          {book.pages} стр.
+                          {book.year}
                         </span>
+                        {"status" in book && book.status === "soon" && (
+                          <span
+                            className="font-ibm text-xs tracking-widest uppercase px-2.5 py-1 border"
+                            style={{ borderColor: "hsl(35 65% 55% / 0.5)", color: "hsl(35 65% 55%)" }}
+                          >
+                            Скоро
+                          </span>
+                        )}
                       </div>
                       <h3 className="font-cormorant text-3xl font-light text-foreground mb-4">
                         {book.title}
@@ -581,20 +590,9 @@ export default function Index() {
                       <p className="font-cormorant italic text-muted-foreground leading-relaxed text-lg mb-6">
                         {book.description}
                       </p>
-                      <button
-                        className="self-start font-ibm text-xs tracking-widest uppercase px-6 py-2.5 border transition-all hover:opacity-90"
-                        style={{ borderColor: "hsl(35 65% 55%)", color: "hsl(35 65% 55%)" }}
-                        onMouseEnter={e => {
-                          (e.currentTarget as HTMLButtonElement).style.background = "hsl(35 65% 55%)";
-                          (e.currentTarget as HTMLButtonElement).style.color = "hsl(24 15% 7%)";
-                        }}
-                        onMouseLeave={e => {
-                          (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                          (e.currentTarget as HTMLButtonElement).style.color = "hsl(35 65% 55%)";
-                        }}
-                      >
-                        Купить книгу
-                      </button>
+                      <p className="font-ibm text-xs text-muted-foreground">
+                        Книга готовится к публикации. Следите за обновлениями.
+                      </p>
                     </div>
                   </div>
                 </div>
