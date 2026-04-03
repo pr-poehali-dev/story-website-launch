@@ -123,6 +123,28 @@ export default function Index() {
   const [scrollPos, setScrollPos] = useState(0);
   const readerRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus("sending");
+    try {
+      const res = await fetch("https://functions.poehali.dev/666202d2-7ee4-4763-8f19-2bfc4f9cdfa0", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setFormStatus("sent");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setFormStatus("error");
+      }
+    } catch {
+      setFormStatus("error");
+    }
+  };
 
   const toggleBookmark = (id: number) => {
     setBookmarks((prev) =>
@@ -714,46 +736,74 @@ export default function Index() {
               <h3 className="font-cormorant text-2xl font-light mb-6">
                 Написать сообщение
               </h3>
-              <div className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="font-ibm text-xs tracking-widest uppercase text-muted-foreground block mb-2">
-                      Имя
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-                      placeholder="Ваше имя"
-                    />
+              {formStatus === "sent" ? (
+                <div className="text-center py-8">
+                  <Icon name="CheckCircle" size={36} className="mx-auto mb-4" style={{ color: "hsl(35 65% 55%)" }} />
+                  <p className="font-cormorant text-xl text-foreground mb-2">Сообщение отправлено!</p>
+                  <p className="font-ibm text-xs text-muted-foreground">Герман ответит вам в ближайшее время.</p>
+                  <button
+                    onClick={() => setFormStatus("idle")}
+                    className="mt-6 font-ibm text-xs tracking-widest uppercase text-muted-foreground hover:text-gold transition-colors border-b border-transparent hover:border-gold pb-1"
+                  >
+                    Отправить ещё одно
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleFormSubmit} className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-ibm text-xs tracking-widest uppercase text-muted-foreground block mb-2">
+                        Имя
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                        className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
+                        placeholder="Ваше имя"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-ibm text-xs tracking-widest uppercase text-muted-foreground block mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                        className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
+                        placeholder="email@example.com"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="font-ibm text-xs tracking-widest uppercase text-muted-foreground block mb-2">
-                      Email
+                      Сообщение
                     </label>
-                    <input
-                      type="email"
-                      className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-                      placeholder="email@example.com"
+                    <textarea
+                      rows={5}
+                      required
+                      value={formData.message}
+                      onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+                      className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors resize-none"
+                      placeholder="Ваше сообщение..."
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="font-ibm text-xs tracking-widest uppercase text-muted-foreground block mb-2">
-                    Сообщение
-                  </label>
-                  <textarea
-                    rows={5}
-                    className="w-full bg-muted border border-border px-4 py-3 font-cormorant text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors resize-none"
-                    placeholder="Ваше сообщение..."
-                  />
-                </div>
-                <button
-                  className="font-ibm text-sm tracking-wider uppercase px-8 py-3 hover:opacity-90 transition-opacity"
-                  style={{ background: "hsl(35 65% 55%)", color: "hsl(24 15% 7%)" }}
-                >
-                  Отправить
-                </button>
-              </div>
+                  {formStatus === "error" && (
+                    <p className="font-ibm text-xs text-red-400">Ошибка отправки. Попробуйте ещё раз или напишите напрямую на почту.</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={formStatus === "sending"}
+                    className="font-ibm text-sm tracking-wider uppercase px-8 py-3 hover:opacity-90 transition-opacity disabled:opacity-50"
+                    style={{ background: "hsl(35 65% 55%)", color: "hsl(24 15% 7%)" }}
+                  >
+                    {formStatus === "sending" ? "Отправляю..." : "Отправить"}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}
